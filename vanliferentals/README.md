@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VanLifeRentals - Page Skeleton
 
-## Getting Started
+This README lists the placeholder pages and logic created for the IA6 practice.
 
-First, run the development server:
+## Pages
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- app/page.tsx - Home landing with models and contact sections
+- app/models/page.tsx - Models catalog list
+- app/models/[modelId]/page.tsx - Model detail with comments placeholder
+- app/contact/page.tsx - Contact request form
+- app/auth/login/page.tsx - Login page
+- app/auth/register/page.tsx - Register page
+- app/editor/page.tsx - Editor dashboard
+- app/editor/models/new/page.tsx - Create model page
+- app/editor/models/[modelId]/edit/page.tsx - Edit model page
+- app/admin/page.tsx - Admin dashboard
+- app/admin/users/page.tsx - User and role management page
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Logic (base)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- lib/types.ts - Shared types
+- lib/mockData.ts - Mock data store
+- lib/validators.ts - Payload validation
+- lib/auth.ts - Mock auth and role checks
+- lib/http.ts - JSON helpers
+- lib/db.ts - Database placeholder
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Services
 
-## Learn More
+- lib/services/modelsService.ts - Models data access
+- lib/services/commentsService.ts - Comments data access
+- lib/services/contactService.ts - Contact requests data access
+- lib/services/authService.ts - Register/login helpers
+- lib/services/adminService.ts - Users and roles data access
 
-To learn more about Next.js, take a look at the following resources:
+## Controllers
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- lib/controllers/modelsController.ts - Models logic and validation
+- lib/controllers/commentsController.ts - Comments logic and validation
+- lib/controllers/contactController.ts - Contact logic and validation
+- lib/controllers/authController.ts - Auth logic and validation
+- lib/controllers/adminController.ts - Admin logic and validation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## API Endpoints
 
-## Deploy on Vercel
+- app/api/models/route.ts - GET/POST models
+- app/api/models/[modelId]/route.ts - GET/PUT model detail
+- app/api/models/[modelId]/comments/route.ts - GET/POST comments
+- app/api/contact/route.ts - POST contact request
+- app/api/auth/register/route.ts - POST register
+- app/api/auth/login/route.ts - POST login
+- app/api/auth/[...auth]/route.ts - Auth.js placeholder
+- app/api/admin/users/route.ts - GET users (admin)
+- app/api/admin/users/[userId]/role/route.ts - PUT role (admin)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Prisma
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- prisma/schema.prisma - Data schema
+- prisma/seed.ts - Seed placeholder
