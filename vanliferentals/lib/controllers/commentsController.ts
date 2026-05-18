@@ -6,20 +6,22 @@ import {
 import { getModelService } from "../services/modelsService";
 import { validateCommentInput } from "../validators";
 
-export function listComments(modelId: string): Result<Comment[]> {
-  const model = getModelService(modelId);
+export async function listComments(
+  modelId: string
+): Promise<Result<Comment[]>> {
+  const model = await getModelService(modelId);
   if (!model) {
     return { ok: false, status: 404, error: { message: "Model not found" } };
   }
-  return { ok: true, data: listCommentsService(modelId) };
+  return { ok: true, data: await listCommentsService(model.id) };
 }
 
-export function createComment(
+export async function createComment(
   modelId: string,
   userId: string,
   payload: unknown
-): Result<Comment> {
-  const model = getModelService(modelId);
+): Promise<Result<Comment>> {
+  const model = await getModelService(modelId);
   if (!model) {
     return { ok: false, status: 404, error: { message: "Model not found" } };
   }
@@ -33,8 +35,8 @@ export function createComment(
     };
   }
 
-  const comment = createCommentService(
-    modelId,
+  const comment = await createCommentService(
+    model.id,
     userId,
     validation.data.content
   );

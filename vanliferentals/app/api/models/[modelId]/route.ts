@@ -1,4 +1,4 @@
-import { getMockSession, requireRole } from "@/lib/auth";
+import { getSession, requireRole } from "@/lib/auth";
 import { getModel, updateModel } from "@/lib/controllers/modelsController";
 import { jsonResult, parseJson } from "@/lib/http";
 
@@ -12,14 +12,14 @@ export async function GET(
   _request: Request,
   { params }: RouteParams
 ) {
-  return jsonResult(getModel(params.modelId));
+  return jsonResult(await getModel(params.modelId));
 }
 
 export async function PUT(
   request: Request,
   { params }: RouteParams
 ) {
-  const authCheck = requireRole(getMockSession(request), ["EDITOR", "ADMIN"]);
+  const authCheck = requireRole(await getSession(), ["EDITOR", "ADMIN"]);
   if (!authCheck.ok) {
     return jsonResult(authCheck);
   }
@@ -29,6 +29,6 @@ export async function PUT(
     return jsonResult(body);
   }
 
-  const result = updateModel(params.modelId, body.data);
+  const result = await updateModel(params.modelId, body.data);
   return jsonResult(result);
 }

@@ -47,6 +47,7 @@ export function validateModelInput(data: unknown): ValidationResult<ModelInput> 
     errors.push("description is required");
   if (!isNumber(data.pricePerDay)) errors.push("pricePerDay is required");
   if (!isStringArray(data.features)) errors.push("features is required");
+  if (!isNonEmptyString(data.imageUrl)) errors.push("imageUrl is required");
 
   if (errors.length > 0) return { ok: false, errors };
 
@@ -55,9 +56,18 @@ export function validateModelInput(data: unknown): ValidationResult<ModelInput> 
     description: asString(data.description),
     pricePerDay: data.pricePerDay as number,
     features: data.features as string[],
-    imageUrl: isNonEmptyString(data.imageUrl)
-      ? asString(data.imageUrl)
+    imageUrl: asString(data.imageUrl),
+    currency: isNonEmptyString(data.currency)
+      ? asString(data.currency)
       : undefined,
+    seats: isNumber(data.seats) ? (data.seats as number) : undefined,
+    beds: isNumber(data.beds) ? (data.beds as number) : undefined,
+    transmission: isNonEmptyString(data.transmission)
+      ? asString(data.transmission)
+      : undefined,
+    fuel: isNonEmptyString(data.fuel) ? asString(data.fuel) : undefined,
+    isFeatured:
+      typeof data.isFeatured === "boolean" ? data.isFeatured : undefined,
   };
 
   return { ok: true, data: input };
@@ -102,6 +112,39 @@ export function validateModelUpdateInput(
     else input.imageUrl = asString(data.imageUrl);
   }
 
+  if (data.currency !== undefined) {
+    if (!isNonEmptyString(data.currency))
+      errors.push("currency must be a string");
+    else input.currency = asString(data.currency);
+  }
+
+  if (data.seats !== undefined) {
+    if (!isNumber(data.seats)) errors.push("seats must be a number");
+    else input.seats = data.seats as number;
+  }
+
+  if (data.beds !== undefined) {
+    if (!isNumber(data.beds)) errors.push("beds must be a number");
+    else input.beds = data.beds as number;
+  }
+
+  if (data.transmission !== undefined) {
+    if (!isNonEmptyString(data.transmission))
+      errors.push("transmission must be a string");
+    else input.transmission = asString(data.transmission);
+  }
+
+  if (data.fuel !== undefined) {
+    if (!isNonEmptyString(data.fuel)) errors.push("fuel must be a string");
+    else input.fuel = asString(data.fuel);
+  }
+
+  if (data.isFeatured !== undefined) {
+    if (typeof data.isFeatured !== "boolean")
+      errors.push("isFeatured must be a boolean");
+    else input.isFeatured = data.isFeatured;
+  }
+
   if (errors.length > 0) return { ok: false, errors };
   if (Object.keys(input).length === 0) {
     return { ok: false, errors: ["At least one field is required"] };
@@ -130,7 +173,7 @@ export function validateContactInput(
   }
   const errors: string[] = [];
 
-  if (!isNonEmptyString(data.name)) errors.push("name is required");
+  if (!isNonEmptyString(data.fullName)) errors.push("fullName is required");
   if (!isNonEmptyString(data.email)) errors.push("email is required");
   if (!isNonEmptyString(data.message)) errors.push("message is required");
 
@@ -139,9 +182,16 @@ export function validateContactInput(
   return {
     ok: true,
     data: {
-      name: asString(data.name),
+      fullName: asString(data.fullName),
       email: asString(data.email),
+      phone: isNonEmptyString(data.phone) ? asString(data.phone) : undefined,
       message: asString(data.message),
+      pickupDate: isNonEmptyString(data.pickupDate)
+        ? asString(data.pickupDate)
+        : undefined,
+      returnDate: isNonEmptyString(data.returnDate)
+        ? asString(data.returnDate)
+        : undefined,
     },
   };
 }

@@ -1,126 +1,117 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { revalidatePath } from "next/cache";
+import { formatDailyPrice } from "@/lib/formatters";
+import { prisma } from "@/lib/prisma";
 
 type ModelDetailPageProps = {
-  params: {
+  params: Promise<{
     modelId: string;
-  };
+  }>;
 };
 
-const modelData: Record<
-  string,
-  {
-    name: string;
-    summary: string;
-    price: string;
-    stats: string[];
-    highlights: string[];
-  }
-> = {
-  aurora: {
-    name: "Aurora 4x4",
-    summary:
-      "All weather cabin with solar power, insulation, and quiet heating.",
-    price: "120/day",
-    stats: ["Sleeps 4", "4x4", "Solar kit"],
-    highlights: [
-      "Full insulation for cold nights",
-      "Indoor and outdoor storage lockers",
-      "Two burner kitchen and 50L fridge",
-    ],
-  },
-  drift: {
-    name: "Driftline Compact",
-    summary: "Lightweight camper for quick city escapes and coastal trips.",
-    price: "90/day",
-    stats: ["Sleeps 2", "Auto", "Fast setup"],
-    highlights: [
-      "Low height for easy parking",
-      "Instant pop top bed",
-      "USB power and cool box",
-    ],
-  },
-  summit: {
-    name: "Summit Family",
-    summary: "Roomy interior with full galley and hot water system.",
-    price: "140/day",
-    stats: ["Sleeps 5", "Kitchen", "Hot water"],
-    highlights: [
-      "Convertible lounge for kids",
-      "Indoor shower and toilet",
-      "Large awning and table",
-    ],
-  },
-};
-
-const comments = [
-  {
-    name: "Nora G.",
-    date: "Apr 2026",
-    text: "Easy pickup and the Aurora handled mountain roads well.",
-  },
-  {
-    name: "Luis P.",
-    date: "Mar 2026",
-    text: "Clean interior and great storage for bikes.",
-  },
-];
-
-export default function ModelDetailPage({
+export default async function ModelDetailPage({
   params,
 }: ModelDetailPageProps) {
-  const model =
-    modelData[params.modelId] ??
-    ({
-      name: "Custom Camper",
-      summary: "Flexible layout with the essentials for a relaxed trip.",
-      price: "100/day",
-      stats: ["Sleeps 2", "Manual", "Kitchenette"],
-      highlights: [
-        "Simple storage and seating",
-        "Compact power system",
-        "Easy driving feel",
-      ],
-    } as const);
+  const { modelId } = await params;
+
+  if (!modelId) {
+    notFound();
+  }
+
+  const model = await prisma.vanModel.findUnique({
+    where: { slug: modelId },
+  });
+
+  if (model === null) {
+    notFound();
+  }
+
+  const comments = await prisma.comment.findMany({
+    where: { modelId: model.id },
+    include: { user: true },
+    orderBy: { createdAt: "desc" },
+  });
+
+  async function submitComment(formData: FormData) {
+    "use server";
+
+    const content = String(formData.get("content") ?? "").trim();
+
+    if (!content) {
+      return;
+    }
+
+    await prisma.comment.create({
+      data: {
+        modelId: model.id!,
+        userId: "TEMP_USER_ID",
+        content,
+      },
+    });
+
+    revalidatePath(`/models/${model.slug}`);
+  }
+
+  const stats = [
+    model.seats ? `${model.seats} places` : null,
+    model.beds ? `${model.beds} llits` : null,
+    model.transmission ? `Canvi ${model.transmission}` : null,
+    model.fuel ? `Combustible ${model.fuel}` : null,
+  ].filter(Boolean) as string[];
 
   return (
     <div className="page">
       <div className="breadcrumbs">
         <Link className="link-inline" href="/models">
-          Back to catalog
+          Tornar al cataleg
         </Link>
       </div>
 
       <section className="detail-grid">
         <div className="detail-main">
           <p className="eyebrow">Model</p>
+
           <h1>{model.name}</h1>
-          <p className="lead">{model.summary}</p>
-          <div className="stat-grid">
-            {model.stats.map((stat) => (
-              <div className="stat" key={stat}>
-                <p className="stat-value">{stat}</p>
-                <p className="stat-label">Core spec</p>
-              </div>
-            ))}
-          </div>
+
+          <p className="lead">{model.description}</p>
+
+          {stats.length > 0 && (
+            <div className="stat-grid">
+              {stats.map((stat) => (
+                <div className="stat" key={stat}>
+                  <p className="stat-value">{stat}</p>
+                  <p className="stat-label">Dades clau</p>
+                </div>
+              ))}
+            </div>
+          )}
+
           <ul className="feature-list">
-            {model.highlights.map((item) => (
+            {model.features.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
         </div>
+
         <aside className="detail-aside card">
-          <p className="badge">From {model.price}</p>
-          <h3>Trip estimate</h3>
-          <p className="muted">
-            Share dates and pickup city to get exact pricing.
+          <p className="badge">
+            {formatDailyPrice(model.pricePerDay, model.currency)}
           </p>
+
+          <h3>Reserva la teva ruta</h3>
+
+          <p className="muted">
+            Demana informacio sobre dates i lloc de recollida.
+          </p>
+
           <div className="aside-actions">
             <Link className="btn btn-primary" href="/contact">
-              Request info
+              Sol-licitar info
             </Link>
+
             <Link className="btn btn-ghost" href="/auth/login">
-              Login to comment
+              Inicia sessio per comentar
             </Link>
           </div>
         </aside>
@@ -129,19 +120,57 @@ export default function ModelDetailPage({
       <section className="section">
         <div className="section-head">
           <div>
-            <p className="eyebrow">Community</p>
-            <h2>Recent comments</h2>
-            <p>Comments are visible to everyone. Login to add yours.</p>
+            <p className="eyebrow">Comunitat</p>
+
+            <h2>Comentaris recents</h2>
+
+            <p>Els comentaris son visibles per a tothom.</p>
           </div>
         </div>
+
+        <form className="card form" action={submitComment}>
+          <label className="field">
+            <span>Comparteix la teva experiencia</span>
+
+            <textarea
+              className="textarea"
+              name="content"
+              rows={4}
+              required
+            />
+          </label>
+
+          <button className="btn btn-primary" type="submit">
+            Publicar comentari
+          </button>
+        </form>
+
         <div className="comment-list">
-          {comments.map((comment) => (
-            <article className="comment-card" key={comment.name}>
-              <p className="comment-name">{comment.name}</p>
-              <p className="comment-meta">{comment.date}</p>
-              <p>{comment.text}</p>
+          {comments.length === 0 ? (
+            <article className="comment-card">
+              <p className="comment-name">
+                Encara no hi ha comentaris
+              </p>
+
+              <p className="comment-meta">
+                Sigues el primer a escriure.
+              </p>
             </article>
-          ))}
+          ) : (
+            comments.map((comment) => (
+              <article className="comment-card" key={comment.id}>
+                <p className="comment-name">
+                  {comment.user?.name ?? "Usuari"}
+                </p>
+
+                <p className="comment-meta">
+                  {comment.createdAt.toLocaleDateString("ca-ES")}
+                </p>
+
+                <p>{comment.content}</p>
+              </article>
+            ))
+          )}
         </div>
       </section>
     </div>

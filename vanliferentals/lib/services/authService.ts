@@ -1,27 +1,57 @@
+import bcrypt from "bcryptjs";
+import { prisma } from "@/lib/prisma";
 import { LoginInput, RegisterInput, User, UserSafe } from "../types";
-import {
-  createUser,
-  findUserByEmail,
-  validateUserPassword,
-} from "../mockData";
 
 function toSafeUser(user: User): UserSafe {
-  const { password, ...safeUser } = user;
+  const { hashedPassword, ...safeUser } = user;
   return safeUser;
 }
 
-export function userExistsByEmail(email: string): boolean {
-  return Boolean(findUserByEmail(email));
+export async function userExistsByEmail(email: string): Promise<boolean> {
+  const user = await prisma.user.findUnique({ where: { email } });
+  return Boolean(user);
 }
 
-export function registerUserService(input: RegisterInput): UserSafe {
-  return toSafeUser(createUser(input));
+export async function registerUserService(
+  input: RegisterInput
+): Promise<UserSafe> {
+  const hashedPassword = await bcrypt.hash(input.password, 10);
+  const user = await prisma.user.create({
+    data: {
+      name: input.name,
+      email: input.email,
+      hashedPassword,
+      role: "USER",
+    },
+  });
+
+  return toSafeUser({
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    hashedPassword: user.hashedPassword,
+  });
 }
 
-export function loginUserService(input: LoginInput): UserSafe | undefined {
-  const user = findUserByEmail(input.email);
-  if (!user || !validateUserPassword(user, input.password)) {
+export async function loginUserService(
+  input: LoginInput
+): Promise<UserSafe | undefined> {
+  const user = await prisma.user.findUnique({ where: { email: input.email } });
+  if (!user || !user.hashedPassword) {
     return undefined;
   }
-  return toSafeUser(user);
+
+  const isValid = await bcrypt.compare(input.password, user.hashedPassword);
+  if (!isValid) {
+    return undefined;
+  }
+
+  return toSafeUser({
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    hashedPassword: user.hashedPassword,
+  });
 }

@@ -1,4 +1,4 @@
-import { getMockSession, requireAuth } from "@/lib/auth";
+import { getSession, requireAuth } from "@/lib/auth";
 import { createComment, listComments } from "@/lib/controllers/commentsController";
 import { jsonResult, parseJson } from "@/lib/http";
 
@@ -12,14 +12,14 @@ export async function GET(
   _request: Request,
   { params }: RouteParams
 ) {
-  return jsonResult(listComments(params.modelId));
+  return jsonResult(await listComments(params.modelId));
 }
 
 export async function POST(
   request: Request,
   { params }: RouteParams
 ) {
-  const authCheck = requireAuth(getMockSession(request));
+  const authCheck = requireAuth(await getSession());
   if (!authCheck.ok) {
     return jsonResult(authCheck);
   }
@@ -29,9 +29,9 @@ export async function POST(
     return jsonResult(body);
   }
 
-  const result = createComment(
+  const result = await createComment(
     params.modelId,
-    authCheck.data.userId,
+    authCheck.data.user?.id ?? "",
     body.data
   );
   return jsonResult(result, 201);

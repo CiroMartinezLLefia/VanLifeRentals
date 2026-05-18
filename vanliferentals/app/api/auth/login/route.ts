@@ -7,6 +7,6 @@ export async function POST(request: Request) {
     return jsonResult(body);
   }
 
-  const result = login(body.data);
+  const result = await login(body.data);
   return jsonResult(result);
 }

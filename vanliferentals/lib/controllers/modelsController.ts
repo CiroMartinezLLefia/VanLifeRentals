@@ -10,19 +10,19 @@ import {
   validateModelUpdateInput,
 } from "../validators";
 
-export function listModels(): Result<Model[]> {
-  return { ok: true, data: listModelsService() };
+export async function listModels(): Promise<Result<Model[]>> {
+  return { ok: true, data: await listModelsService() };
 }
 
-export function getModel(modelId: string): Result<Model> {
-  const model = getModelService(modelId);
+export async function getModel(modelId: string): Promise<Result<Model>> {
+  const model = await getModelService(modelId);
   if (!model) {
     return { ok: false, status: 404, error: { message: "Model not found" } };
   }
   return { ok: true, data: model };
 }
 
-export function createModel(payload: unknown): Result<Model> {
+export async function createModel(payload: unknown): Promise<Result<Model>> {
   const validation = validateModelInput(payload);
   if (!validation.ok) {
     return {
@@ -31,11 +31,14 @@ export function createModel(payload: unknown): Result<Model> {
       error: { message: "Validation failed", details: validation.errors },
     };
   }
-  const model = createModelService(validation.data);
+  const model = await createModelService(validation.data);
   return { ok: true, data: model };
 }
 
-export function updateModel(modelId: string, payload: unknown): Result<Model> {
+export async function updateModel(
+  modelId: string,
+  payload: unknown
+): Promise<Result<Model>> {
   const validation = validateModelUpdateInput(payload);
   if (!validation.ok) {
     return {
@@ -45,7 +48,7 @@ export function updateModel(modelId: string, payload: unknown): Result<Model> {
     };
   }
 
-  const model = updateModelService(modelId, validation.data);
+  const model = await updateModelService(modelId, validation.data);
   if (!model) {
     return { ok: false, status: 404, error: { message: "Model not found" } };
   }

@@ -5,14 +5,14 @@ import {
 } from "../services/adminService";
 import { validateRoleUpdateInput } from "../validators";
 
-export function listUsers(): Result<UserSafe[]> {
-  return { ok: true, data: listUsersService() };
+export async function listUsers(): Promise<Result<UserSafe[]>> {
+  return { ok: true, data: await listUsersService() };
 }
 
-export function updateUserRole(
+export async function updateUserRole(
   userId: string,
   payload: unknown
-): Result<UserSafe> {
+): Promise<Result<UserSafe>> {
   const validation = validateRoleUpdateInput(payload);
   if (!validation.ok) {
     return {
@@ -22,7 +22,7 @@ export function updateUserRole(
     };
   }
 
-  const user = updateUserRoleService(userId, validation.data.role);
+  const user = await updateUserRoleService(userId, validation.data.role);
   if (!user) {
     return { ok: false, status: 404, error: { message: "User not found" } };
   }

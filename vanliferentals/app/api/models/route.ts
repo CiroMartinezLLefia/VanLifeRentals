@@ -1,13 +1,13 @@
-import { getMockSession, requireRole } from "@/lib/auth";
+import { getSession, requireRole } from "@/lib/auth";
 import { createModel, listModels } from "@/lib/controllers/modelsController";
 import { jsonResult, parseJson } from "@/lib/http";
 
 export async function GET() {
-  return jsonResult(listModels());
+  return jsonResult(await listModels());
 }
 
 export async function POST(request: Request) {
-  const authCheck = requireRole(getMockSession(request), ["EDITOR", "ADMIN"]);
+  const authCheck = requireRole(await getSession(), ["EDITOR", "ADMIN"]);
   if (!authCheck.ok) {
     return jsonResult(authCheck);
   }
@@ -17,6 +17,6 @@ export async function POST(request: Request) {
     return jsonResult(body);
   }
 
-  const result = createModel(body.data);
+  const result = await createModel(body.data);
   return jsonResult(result, 201);
 }

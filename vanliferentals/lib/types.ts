@@ -2,21 +2,30 @@ export type UserRole = "USER" | "EDITOR" | "ADMIN";
 
 export type User = {
   id: string;
-  name: string;
+  name?: string | null;
   email: string;
   role: UserRole;
-  password: string;
+  hashedPassword?: string | null;
 };
 
-export type UserSafe = Omit<User, "password">;
+export type UserSafe = Omit<User, "hashedPassword">;
 
 export type Model = {
   id: string;
+  slug: string;
   name: string;
   description: string;
   pricePerDay: number;
+  currency: string;
+  seats?: number | null;
+  beds?: number | null;
+  transmission?: string | null;
+  fuel?: string | null;
   features: string[];
-  imageUrl?: string;
+  imageUrl: string;
+  isFeatured: boolean;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type Comment = {
@@ -24,14 +33,18 @@ export type Comment = {
   modelId: string;
   userId: string;
   content: string;
+  rating?: number | null;
   createdAt: string;
 };
 
 export type ContactRequest = {
   id: string;
-  name: string;
+  fullName: string;
   email: string;
+  phone?: string | null;
   message: string;
+  pickupDate?: string | null;
+  returnDate?: string | null;
   createdAt: string;
 };
 
@@ -40,7 +53,13 @@ export type ModelInput = {
   description: string;
   pricePerDay: number;
   features: string[];
-  imageUrl?: string;
+  imageUrl: string;
+  currency?: string;
+  seats?: number;
+  beds?: number;
+  transmission?: string;
+  fuel?: string;
+  isFeatured?: boolean;
 };
 
 export type ModelUpdateInput = Partial<ModelInput>;
@@ -50,9 +69,12 @@ export type CommentInput = {
 };
 
 export type ContactInput = {
-  name: string;
+  fullName: string;
   email: string;
+  phone?: string;
   message: string;
+  pickupDate?: string;
+  returnDate?: string;
 };
 
 export type LoginInput = {

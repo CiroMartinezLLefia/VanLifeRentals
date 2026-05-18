@@ -7,6 +7,6 @@ export async function POST(request: Request) {
     return jsonResult(body);
   }
 
-  const result = createContact(body.data);
+  const result = await createContact(body.data);
   return jsonResult(result, 201);
 }

@@ -2,7 +2,9 @@ import { ContactRequest, Result } from "../types";
 import { createContactRequestService } from "../services/contactService";
 import { validateContactInput } from "../validators";
 
-export function createContact(payload: unknown): Result<ContactRequest> {
+export async function createContact(
+  payload: unknown
+): Promise<Result<ContactRequest>> {
   const validation = validateContactInput(payload);
   if (!validation.ok) {
     return {
@@ -12,6 +14,6 @@ export function createContact(payload: unknown): Result<ContactRequest> {
     };
   }
 
-  const contactRequest = createContactRequestService(validation.data);
+  const contactRequest = await createContactRequestService(validation.data);
   return { ok: true, data: contactRequest };
 }

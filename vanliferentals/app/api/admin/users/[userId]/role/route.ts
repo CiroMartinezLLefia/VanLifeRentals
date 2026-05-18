@@ -1,4 +1,4 @@
-import { getMockSession, requireRole } from "@/lib/auth";
+import { getSession, requireRole } from "@/lib/auth";
 import { updateUserRole } from "@/lib/controllers/adminController";
 import { jsonResult, parseJson } from "@/lib/http";
 
@@ -12,7 +12,7 @@ export async function PUT(
   request: Request,
   { params }: RouteParams
 ) {
-  const authCheck = requireRole(getMockSession(request), ["ADMIN"]);
+  const authCheck = requireRole(await getSession(), ["ADMIN"]);
   if (!authCheck.ok) {
     return jsonResult(authCheck);
   }
@@ -22,6 +22,6 @@ export async function PUT(
     return jsonResult(body);
   }
 
-  const result = updateUserRole(params.userId, body.data);
+  const result = await updateUserRole(params.userId, body.data);
   return jsonResult(result);
 }

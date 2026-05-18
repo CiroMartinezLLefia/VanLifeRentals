@@ -1,9 +1,7 @@
+import { auth } from "@/auth";
 import { Result, UserRole } from "./types";
 
-export type Session = {
-  userId: string;
-  role: UserRole;
-};
+export type Session = Awaited<ReturnType<typeof auth>>;
 
 const roleValues: UserRole[] = ["USER", "EDITOR", "ADMIN"];
 
@@ -11,20 +9,12 @@ function isUserRole(value: string): value is UserRole {
   return roleValues.includes(value as UserRole);
 }
 
-export function getMockSession(request: Request): Session | null {
-  const userId = request.headers.get("x-user-id");
-  const roleHeader = request.headers.get("x-user-role");
-  if (!userId || !roleHeader) {
-    return null;
-  }
-  if (!isUserRole(roleHeader)) {
-    return null;
-  }
-  return { userId, role: roleHeader };
+export async function getSession(): Promise<Session> {
+  return auth();
 }
 
 export function requireAuth(session: Session | null): Result<Session> {
-  if (!session) {
+  if (!session?.user?.id) {
     return {
       ok: false,
       status: 401,
@@ -42,7 +32,8 @@ export function requireRole(
   if (!auth.ok) {
     return auth;
   }
-  if (!roles.includes(auth.data.role)) {
+  const role = auth.data.user?.role ?? "";
+  if (!isUserRole(role) || !roles.includes(role)) {
     return { ok: false, status: 403, error: { message: "Access denied" } };
   }
   return auth;

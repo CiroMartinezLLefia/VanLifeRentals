@@ -17,20 +17,24 @@ export default function ContactPage() {
       <section className="contact-grid">
         <form className="card form" action="/api/contact" method="post">
           <label className="field">
-            <span>Name</span>
-            <input className="input" name="name" type="text" required />
+            <span>Full name</span>
+            <input className="input" name="fullName" type="text" required />
           </label>
           <label className="field">
             <span>Email</span>
             <input className="input" name="email" type="email" required />
           </label>
           <label className="field">
-            <span>Travel dates</span>
-            <input className="input" name="dates" type="text" />
+            <span>Phone</span>
+            <input className="input" name="phone" type="tel" />
           </label>
           <label className="field">
-            <span>Group size</span>
-            <input className="input" name="group" type="number" min={1} />
+            <span>Pickup date</span>
+            <input className="input" name="pickupDate" type="date" />
+          </label>
+          <label className="field">
+            <span>Return date</span>
+            <input className="input" name="returnDate" type="date" />
           </label>
           <label className="field">
             <span>Message</span>
@@ -39,7 +43,7 @@ export default function ContactPage() {
           <button className="btn btn-primary" type="submit">
             Send request
           </button>
-          <p className="form-note">Demo form, no data is stored yet.</p>
+          <p className="form-note">We will confirm your request by email.</p>
         </form>
 
         <aside className="card info-card">

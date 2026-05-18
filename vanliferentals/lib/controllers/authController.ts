@@ -6,7 +6,7 @@ import {
 } from "../services/authService";
 import { validateLoginInput, validateRegisterInput } from "../validators";
 
-export function register(payload: unknown): Result<UserSafe> {
+export async function register(payload: unknown): Promise<Result<UserSafe>> {
   const validation = validateRegisterInput(payload);
   if (!validation.ok) {
     return {
@@ -16,7 +16,7 @@ export function register(payload: unknown): Result<UserSafe> {
     };
   }
 
-  if (userExistsByEmail(validation.data.email)) {
+  if (await userExistsByEmail(validation.data.email)) {
     return {
       ok: false,
       status: 409,
@@ -24,7 +24,7 @@ export function register(payload: unknown): Result<UserSafe> {
     };
   }
 
-  const user = registerUserService(validation.data);
+  const user = await registerUserService(validation.data);
   return { ok: true, data: user };
 }
 
@@ -33,7 +33,7 @@ type LoginResponse = {
   token: string;
 };
 
-export function login(payload: unknown): Result<LoginResponse> {
+export async function login(payload: unknown): Promise<Result<LoginResponse>> {
   const validation = validateLoginInput(payload);
   if (!validation.ok) {
     return {
@@ -43,7 +43,7 @@ export function login(payload: unknown): Result<LoginResponse> {
     };
   }
 
-  const user = loginUserService(validation.data);
+  const user = await loginUserService(validation.data);
   if (!user) {
     return {
       ok: false,

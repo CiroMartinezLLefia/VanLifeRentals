@@ -7,6 +7,6 @@ export async function POST(request: Request) {
     return jsonResult(body);
   }
 
-  const result = register(body.data);
+  const result = await register(body.data);
   return jsonResult(result, 201);
 }

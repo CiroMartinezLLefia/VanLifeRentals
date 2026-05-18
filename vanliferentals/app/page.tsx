@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { formatDailyPrice } from "@/lib/formatters";
+import { prisma } from "@/lib/prisma";
 
 const featureHighlights = [
   {
@@ -77,33 +79,6 @@ const featureHighlights = [
         />
       </svg>
     ),
-  },
-];
-
-const featuredModels = [
-  {
-    id: "sunlight-cliff-640",
-    name: "Sunlight Cliff 640",
-    price: "120 EUR / dia",
-    specs: ["Cuina", "Dutxa", "WC"],
-    image:
-      "https://www.freytag-reisemobile.de/wp/wp-content/uploads/2022/11/SUNLIGHT_CLIFF_640_2022-2_web.jpg",
-  },
-  {
-    id: "volkswagen-california",
-    name: "Volkswagen California",
-    price: "150 EUR / dia",
-    specs: ["Dutxa", "GPS", "WC"],
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR3MoqhPMlCq6DXLOGwXsEKZz8_jCH4YoNzbQ&s",
-  },
-  {
-    id: "ford-transit-custom",
-    name: "Ford Transit Custom",
-    price: "110 EUR / dia",
-    specs: ["Cuina", "Frigorific", "GPS"],
-    image:
-      "https://camperplanet.es/wp-content/uploads/2024/11/ford-transit-custom-nugget5.jpg",
   },
 ];
 
@@ -219,7 +194,30 @@ const starIcon = (
   </svg>
 );
 
-export default function HomePage() {
+type HomeModel = {
+  id: string;
+  name: string;
+  pricePerDay: number;
+  currency: string;
+  features: string[];
+  imageUrl: string;
+};
+
+export default async function HomePage() {
+  const featuredModels = (await prisma.vanModel.findMany({
+    where: { isFeatured: true },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+  })) as HomeModel[];
+
+  const modelsToShow =
+    featuredModels.length > 0
+      ? featuredModels
+      : ((await prisma.vanModel.findMany({
+          orderBy: { createdAt: "desc" },
+          take: 3,
+        })) as HomeModel[]);
+
   return (
     <div className="home">
       <section className="hero">
@@ -330,16 +328,18 @@ export default function HomePage() {
             </Link>
           </div>
           <div className="models-grid">
-            {featuredModels.map((model) => (
+            {modelsToShow.map((model) => (
               <article className="model-card" key={model.id}>
-                <img src={model.image} alt={model.name} loading="lazy" />
+                <img src={model.imageUrl} alt={model.name} loading="lazy" />
                 <div className="model-body">
                   <div className="model-header">
                     <h3>{model.name}</h3>
-                    <span className="model-price">{model.price}</span>
+                    <span className="model-price">
+                      {formatDailyPrice(model.pricePerDay, model.currency)}
+                    </span>
                   </div>
                   <div className="model-specs">
-                    {model.specs.map((spec) => (
+                    {model.features.map((spec) => (
                       <span className="model-spec" key={spec}>
                         {spec}
                       </span>
