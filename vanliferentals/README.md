@@ -101,8 +101,10 @@ En esta práctica no hay un backend separado: las rutas de API y la interfaz web
 Pasos recomendados:
 
 1. Sube el repositorio a GitHub y conecta el proyecto en Vercel.
-2. Vercel detecta la configuración del repositorio raíz y usa `vercel.json`.
-3. Define estas variables de entorno en Vercel:
+2. En Vercel, configura `Root Directory = vanliferentals`.
+3. Deja los comandos por defecto: `npm install` y `npm run build`.
+4. La configuración específica del proyecto vive en [vanliferentals/vercel.json](vercel.json).
+5. Define estas variables de entorno en Vercel:
 
 ```text
 DATABASE_URL=postgresql://...
@@ -110,17 +112,17 @@ NEXTAUTH_URL=https://tu-proyecto.vercel.app
 NEXTAUTH_SECRET=una-clave-larga-y-segura
 ```
 
-4. Despliega la rama `main`.
-5. Tras el primer deploy, ejecuta las migraciones y el seed contra la BD de producción:
+6. Despliega la rama `main`.
+7. Tras el primer deploy, ejecuta las migraciones y el seed contra la BD de producción:
 
 ```bash
 npx prisma migrate deploy
 npm run prisma:seed
 ```
 
-6. Verifica la URL pública y ejecuta los smoke tests con `E2E_BASE_URL=https://tu-proyecto.vercel.app`.
+8. Verifica la URL pública y ejecuta los smoke tests con `E2E_BASE_URL=https://tu-proyecto.vercel.app`.
 
-Si Vercel no encuentra `next`, revisa que el `installCommand` esté activo y que el proyecto apunte al repositorio raíz.
+Si Vercel no encuentra `next`, revisa que el Root Directory siga siendo `vanliferentals` y que no exista una configuración de build con prefijo duplicado.
 
 ---
 
