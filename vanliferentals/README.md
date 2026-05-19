@@ -184,7 +184,7 @@ Si Render te da varias URLs, usa estas reglas:
 - app/api/contact/route.ts - POST contact request
 - app/api/auth/register/route.ts - POST register
 - app/api/auth/login/route.ts - POST login
-- app/api/auth/[...auth]/route.ts - Auth.js placeholder
+- app/api/auth/[...nextauth]/route.ts - Auth.js route
 - app/api/admin/users/route.ts - GET users (admin)
 - app/api/admin/users/[userId]/role/route.ts - PUT role (admin)
 
