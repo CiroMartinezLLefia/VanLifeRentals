@@ -94,9 +94,9 @@ Ver [BACKLOG.md](BACKLOG.md) per a tasques pendents i historial resumit de commi
 
 La documentació sobre l'ús d'eines d'IA per generar parts del projecte es troba a [IA_USAGE.md](IA_USAGE.md).
 
-## Despliegue en Vercel
+## Despliegue en Vercel + Render
 
-En esta práctica no hay un backend separado: las rutas de API y la interfaz web se despliegan juntas en la misma app Next.js.
+En esta práctica no hay un backend separado: las rutas de API y la interfaz web se despliegan juntas en la misma app Next.js. La base de datos va aparte en Render PostgreSQL.
 
 Pasos recomendados:
 
@@ -104,7 +104,8 @@ Pasos recomendados:
 2. En Vercel, configura `Root Directory = vanliferentals`.
 3. Deja los comandos por defecto: `npm install` y `npm run build`.
 4. La configuración específica del proyecto vive en [vanliferentals/vercel.json](vercel.json).
-5. Define estas variables de entorno en Vercel:
+5. Crea una base de datos PostgreSQL en Render y copia la `Internal Database URL` o la `External Database URL` que te da Render.
+6. Define estas variables de entorno en Vercel:
 
 ```text
 DATABASE_URL=postgresql://...
@@ -112,17 +113,25 @@ NEXTAUTH_URL=https://tu-proyecto.vercel.app
 NEXTAUTH_SECRET=una-clave-larga-y-segura
 ```
 
-6. Despliega la rama `main`.
-7. Tras el primer deploy, ejecuta las migraciones y el seed contra la BD de producción:
+7. Despliega la rama `main`.
+8. Tras el primer deploy, ejecuta las migraciones y el seed contra la BD de producción de Render:
 
 ```bash
 npx prisma migrate deploy
 npm run prisma:seed
 ```
 
-8. Verifica la URL pública y ejecuta los smoke tests con `E2E_BASE_URL=https://tu-proyecto.vercel.app`.
+9. Verifica la URL pública y ejecuta los smoke tests con `E2E_BASE_URL=https://tu-proyecto.vercel.app`.
 
 Si Vercel no encuentra `next`, revisa que el Root Directory siga siendo `vanliferentals` y que no exista una configuración de build con prefijo duplicado.
+
+### Variables recomendadas para Render
+
+Si Render te da varias URLs, usa estas reglas:
+
+- `DATABASE_URL`: usa la URL de conexión que Render te dé para la aplicación, con formato `postgresql://...`.
+- Si más adelante quieres separar migraciones, puedes guardar una segunda variable como `DIRECT_URL`.
+- Asegúrate de que la URL funcione desde Vercel y desde tu máquina local.
 
 ---
 
