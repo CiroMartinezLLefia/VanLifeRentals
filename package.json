@@ -1,0 +1,10 @@
+{
+  "name": "vanliferentals-workspace",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix vanliferentals run dev",
+    "build": "npm --prefix vanliferentals run build",
+    "start": "npm --prefix vanliferentals run start",
+    "lint": "npm --prefix vanliferentals run lint"
+  }
+}

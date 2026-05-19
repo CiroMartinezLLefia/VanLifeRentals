@@ -1,6 +1,102 @@
-# VanLifeRentals - Page Skeleton
+# VanLifeRentals - IA6 Practice
 
-This README lists the placeholder pages and logic created for the IA6 practice.
+Este repositorio contiene la implementación de la práctica IA6 (landing de lloguer de campers) con Next.js 16, Prisma i Auth.js.
+
+Resumen rápido:
+- App Next.js 16 amb App Router
+- Prisma + PostgreSQL amb `prisma/seed.ts`
+- Autenticació amb `next-auth` i control de rols (USER, EDITOR, ADMIN)
+- API endpoints per a models, comentaris i contacte
+
+---
+
+## Quick start (local)
+
+1. Copia `.env` amb la variable `DATABASE_URL` apuntant a una BD PostgreSQL local.
+2. Instal·la dependències:
+
+```bash
+cd vanliferentals
+npm install
+```
+
+3. Genera Prisma i aplica migracions (desenvolupament):
+
+```bash
+npm run prisma:generate
+npm run prisma:migrate
+npm run prisma:seed
+```
+
+4. Inicia l'aplicació:
+
+```bash
+npm run dev
+```
+
+L'aplicació s'espera disponible a `http://localhost:3000`.
+
+## Credenciales de prueba
+
+Puedes crear cuentas con el endpoint de registro o usar estas credenciales de prueba (si crees manualment els usuaris):
+
+- **ADMIN**
+	- email: admin@vanlife.test
+	- password: Password123!
+
+- **EDITOR**
+	- email: editor@vanlife.test
+	- password: Password123!
+
+- **USER**
+	- email: user@vanlife.test
+	- password: Password123!
+
+Crear un usuari via curl (ejemplo):
+
+```bash
+curl -X POST http://localhost:3000/api/auth/register \
+	-H "Content-Type: application/json" \
+	-d '{"name":"Admin","email":"admin@vanlife.test","password":"Password123!"}'
+```
+
+Si prefieres poblar automáticamente, considera afegir els usuaris al `prisma/seed.ts` o executar un script amb Prisma Client.
+
+## Ejecutar tests E2E (Playwright)
+
+1. Instalar dependencias y binarios Playwright:
+
+```bash
+cd vanliferentals
+npm install
+npx playwright install
+```
+
+2. Inicia la app (en otra terminal):
+
+```bash
+npm run dev
+```
+
+3. Ejecuta los tests:
+
+```bash
+npm run test:e2e
+```
+
+Los tests usan `baseURL` por defecto `http://localhost:3000`. Puedes sobreescribir con `E2E_BASE_URL`.
+
+## Backlog y siguientes pasos
+
+Ver [BACKLOG.md](BACKLOG.md) per a tasques pendents i historial resumit de commits.
+
+## Uso de IA
+
+La documentació sobre l'ús d'eines d'IA per generar parts del projecte es troba a [IA_USAGE.md](IA_USAGE.md).
+
+---
+
+### Archivo y endpoints principales
 
 ## Pages
 
@@ -57,3 +153,4 @@ This README lists the placeholder pages and logic created for the IA6 practice.
 
 - prisma/schema.prisma - Data schema
 - prisma/seed.ts - Seed placeholder
+

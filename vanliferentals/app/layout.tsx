@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Header from "../components/Header";
 import { Plus_Jakarta_Sans, Sora } from "next/font/google";
 import "./globals.css";
 
@@ -26,47 +27,7 @@ export default function RootLayout({
   return (
     <html lang="es" className={`${bodyFont.variable} ${displayFont.variable}`}>
       <body className="site">
-        <header className="site-header">
-          <div className="container header-inner">
-            <Link className="logo" href="/">
-              <span className="logo-mark" aria-hidden="true">
-                <svg viewBox="0 0 36 36" role="img" aria-hidden="true">
-                  <path
-                    d="M6 26L14 16L20 22L28 12L32 26"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </span>
-              <span className="logo-text">
-                <span>VanLife</span>
-                <span>Rentals</span>
-              </span>
-            </Link>
-            <nav className="nav">
-              <Link className="nav-link is-active" href="/">
-                Inici
-              </Link>
-              <Link className="nav-link" href="/models">
-                Cataleg
-              </Link>
-              <Link className="nav-link" href="/#about">
-                Sobre nosaltres
-              </Link>
-              <Link className="nav-link" href="/contact">
-                Contacte
-              </Link>
-            </nav>
-            <div className="nav-actions">
-              <Link className="btn btn-primary btn-pill" href="/contact">
-                Reserva ara
-              </Link>
-            </div>
-          </div>
-        </header>
+        <Header />
         <main className="site-main">{children}</main>
         <footer className="site-footer">
           <div className="container footer-inner">
