@@ -2,6 +2,8 @@ import Link from "next/link";
 import { formatDailyPrice } from "@/lib/formatters";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function ModelsPage() {
   const models = await prisma.vanModel.findMany({
     orderBy: { name: "asc" },

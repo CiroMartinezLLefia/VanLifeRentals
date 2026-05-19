@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { formatDailyPrice } from "@/lib/formatters";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 type ModelDetailPageProps = {
   params: Promise<{
     modelId: string;

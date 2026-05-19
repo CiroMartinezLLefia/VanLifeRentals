@@ -2,6 +2,8 @@ import Link from "next/link";
 import { formatDailyPrice } from "@/lib/formatters";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 const featureHighlights = [
   {
     title: "Furgonetes totalment equipades",
