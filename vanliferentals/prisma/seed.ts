@@ -1,4 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Role } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -101,12 +102,52 @@ const models = [
   },
 ];
 
+const users = [
+  {
+    name: "VanLife Admin",
+    email: "admin@vanlife.test",
+    password: "Password123!",
+    role: Role.ADMIN,
+  },
+  {
+    name: "VanLife Editor",
+    email: "editor@vanlife.test",
+    password: "Password123!",
+    role: Role.EDITOR,
+  },
+  {
+    name: "VanLife User",
+    email: "user@vanlife.test",
+    password: "Password123!",
+    role: Role.USER,
+  },
+];
+
 async function main() {
   for (const model of models) {
     await prisma.vanModel.upsert({
       where: { slug: model.slug },
       update: model,
       create: model,
+    });
+  }
+
+  for (const user of users) {
+    const hashedPassword = await bcrypt.hash(user.password, 10);
+
+    await prisma.user.upsert({
+      where: { email: user.email },
+      update: {
+        name: user.name,
+        role: user.role,
+        hashedPassword,
+      },
+      create: {
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        hashedPassword,
+      },
     });
   }
 }
