@@ -94,6 +94,34 @@ Ver [BACKLOG.md](BACKLOG.md) per a tasques pendents i historial resumit de commi
 
 La documentació sobre l'ús d'eines d'IA per generar parts del projecte es troba a [IA_USAGE.md](IA_USAGE.md).
 
+## Despliegue en Vercel
+
+En esta práctica no hay un backend separado: las rutas de API y la interfaz web se despliegan juntas en la misma app Next.js.
+
+Pasos recomendados:
+
+1. Sube el repositorio a GitHub y conecta el proyecto en Vercel.
+2. Vercel detecta la configuración del repositorio raíz y usa `vercel.json`.
+3. Define estas variables de entorno en Vercel:
+
+```text
+DATABASE_URL=postgresql://...
+NEXTAUTH_URL=https://tu-proyecto.vercel.app
+NEXTAUTH_SECRET=una-clave-larga-y-segura
+```
+
+4. Despliega la rama `main`.
+5. Tras el primer deploy, ejecuta las migraciones y el seed contra la BD de producción:
+
+```bash
+npx prisma migrate deploy
+npm run prisma:seed
+```
+
+6. Verifica la URL pública y ejecuta los smoke tests con `E2E_BASE_URL=https://tu-proyecto.vercel.app`.
+
+Si Vercel no encuentra `next`, revisa que el `installCommand` esté activo y que el proyecto apunte al repositorio raíz.
+
 ---
 
 ### Archivo y endpoints principales

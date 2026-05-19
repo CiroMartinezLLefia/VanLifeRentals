@@ -12,23 +12,39 @@ import {
 
 const now = () => new Date().toISOString();
 const makeId = () => Math.random().toString(36).slice(2, 10);
+const slugify = (value: string) =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 
 let models: Model[] = [
   {
     id: "model-1",
+    slug: "atlas-compact",
     name: "Atlas Compact",
     description: "Compact camper for two people.",
     pricePerDay: 89,
+    currency: "EUR",
+    isFeatured: true,
     features: ["2 beds", "kitchen", "solar"],
     imageUrl: "/models/atlas-compact.jpg",
+    createdAt: now(),
+    updatedAt: now(),
   },
   {
     id: "model-2",
+    slug: "sierra-family",
     name: "Sierra Family",
     description: "Family camper with extra storage.",
     pricePerDay: 129,
+    currency: "EUR",
+    isFeatured: false,
     features: ["4 beds", "bath", "awning"],
     imageUrl: "/models/sierra-family.jpg",
+    createdAt: now(),
+    updatedAt: now(),
   },
 ];
 
@@ -38,21 +54,21 @@ let users: User[] = [
     name: "Alex Smith",
     email: "alex@example.com",
     role: "USER",
-    password: "password123",
+    hashedPassword: "password123",
   },
   {
     id: "user-2",
     name: "Jamie Editor",
     email: "editor@example.com",
     role: "EDITOR",
-    password: "password123",
+    hashedPassword: "password123",
   },
   {
     id: "user-3",
     name: "Pat Admin",
     email: "admin@example.com",
     role: "ADMIN",
-    password: "password123",
+    hashedPassword: "password123",
   },
 ];
 
@@ -79,7 +95,12 @@ export function findModelById(modelId: string): Model | undefined {
 export function createModel(input: ModelInput): Model {
   const model: Model = {
     id: makeId(),
+    slug: slugify(input.name),
     ...input,
+    currency: input.currency ?? "EUR",
+    isFeatured: input.isFeatured ?? false,
+    createdAt: now(),
+    updatedAt: now(),
   };
   models = [...models, model];
   return model;
@@ -93,7 +114,11 @@ export function updateModel(
   if (index === -1) {
     return undefined;
   }
-  const updated: Model = { ...models[index], ...input };
+  const updated: Model = {
+    ...models[index],
+    ...input,
+    updatedAt: now(),
+  };
   models = [...models.slice(0, index), updated, ...models.slice(index + 1)];
   return updated;
 }
@@ -121,9 +146,12 @@ export function createComment(
 export function createContactRequest(input: ContactInput): ContactRequest {
   const contactRequest: ContactRequest = {
     id: makeId(),
-    name: input.name,
+    fullName: input.fullName,
     email: input.email,
+    phone: input.phone ?? null,
     message: input.message,
+    pickupDate: input.pickupDate ?? null,
+    returnDate: input.returnDate ?? null,
     createdAt: now(),
   };
   contactRequests = [...contactRequests, contactRequest];
@@ -148,7 +176,7 @@ export function createUser(input: RegisterInput, role: UserRole = "USER"): User 
     name: input.name,
     email: input.email,
     role,
-    password: input.password,
+    hashedPassword: input.password,
   };
   users = [...users, user];
   return user;
@@ -165,5 +193,5 @@ export function updateUserRole(userId: string, role: UserRole): User | undefined
 }
 
 export function validateUserPassword(user: User, password: string): boolean {
-  return user.password === password;
+  return user.hashedPassword === password;
 }

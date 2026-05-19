@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 
-export default function Header(): JSX.Element {
+export default function Header(): React.ReactElement {
   const pathname = usePathname() ?? "/";
 
   const isActive = (href: string) => {

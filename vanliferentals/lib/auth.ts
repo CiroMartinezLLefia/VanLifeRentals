@@ -13,7 +13,9 @@ export async function getSession(): Promise<Session> {
   return auth();
 }
 
-export function requireAuth(session: Session | null): Result<Session> {
+export function requireAuth(
+  session: Session | null
+): Result<NonNullable<Session>> {
   if (!session?.user?.id) {
     return {
       ok: false,
@@ -27,7 +29,7 @@ export function requireAuth(session: Session | null): Result<Session> {
 export function requireRole(
   session: Session | null,
   roles: UserRole[]
-): Result<Session> {
+): Result<NonNullable<Session>> {
   const auth = requireAuth(session);
   if (!auth.ok) {
     return auth;

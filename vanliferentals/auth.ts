@@ -1,9 +1,10 @@
-import NextAuth from "next-auth";
+import NextAuth, { getServerSession, type NextAuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import type { JWT } from "next-auth/jwt";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
@@ -45,14 +46,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    jwt({ token, user }) {
+    jwt({ token, user }: { token: JWT; user?: unknown }) {
       if (user) {
-        token.id = user.id;
-        token.role = (user as { role?: string }).role;
+        const currentUser = user as { id: string; role?: string };
+        token.id = currentUser.id;
+        token.role = currentUser.role;
       }
       return token;
     },
-    session({ session, token }) {
+    session({ session, token }: { session: any; token: JWT }) {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
@@ -63,4 +65,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: {
     signIn: "/auth/login",
   },
-});
+};
+
+const handler = NextAuth(authOptions);
+
+export const handlers = { GET: handler, POST: handler };
+
+export function auth() {
+  return getServerSession(authOptions);
+}

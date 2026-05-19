@@ -3,22 +3,24 @@ import { createComment, listComments } from "@/lib/controllers/commentsControlle
 import { jsonResult, parseJson } from "@/lib/http";
 
 type RouteParams = {
-  params: {
+  params: Promise<{
     modelId: string;
-  };
+  }>;
 };
 
 export async function GET(
   _request: Request,
   { params }: RouteParams
 ) {
-  return jsonResult(await listComments(params.modelId));
+  const { modelId } = await params;
+  return jsonResult(await listComments(modelId));
 }
 
 export async function POST(
   request: Request,
   { params }: RouteParams
 ) {
+  const { modelId } = await params;
   const authCheck = requireAuth(await getSession());
   if (!authCheck.ok) {
     return jsonResult(authCheck);
@@ -30,7 +32,7 @@ export async function POST(
   }
 
   const result = await createComment(
-    params.modelId,
+    modelId,
     authCheck.data.user?.id ?? "",
     body.data
   );

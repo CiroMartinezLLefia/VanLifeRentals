@@ -1,0 +1,5 @@
+{
+  "installCommand": "npm install --prefix vanliferentals",
+  "buildCommand": "npm --prefix vanliferentals run build",
+  "framework": "nextjs"
+}

@@ -27,8 +27,10 @@ export default async function ModelDetailPage({
     notFound();
   }
 
+  const currentModel = model;
+
   const comments = await prisma.comment.findMany({
-    where: { modelId: model.id },
+    where: { modelId: currentModel.id },
     include: { user: true },
     orderBy: { createdAt: "desc" },
   });
@@ -44,20 +46,20 @@ export default async function ModelDetailPage({
 
     await prisma.comment.create({
       data: {
-        modelId: model.id!,
+        modelId: currentModel.id,
         userId: "TEMP_USER_ID",
         content,
       },
     });
 
-    revalidatePath(`/models/${model.slug}`);
+    revalidatePath(`/models/${currentModel.slug}`);
   }
 
   const stats = [
-    model.seats ? `${model.seats} places` : null,
-    model.beds ? `${model.beds} llits` : null,
-    model.transmission ? `Canvi ${model.transmission}` : null,
-    model.fuel ? `Combustible ${model.fuel}` : null,
+    currentModel.seats ? `${currentModel.seats} places` : null,
+    currentModel.beds ? `${currentModel.beds} llits` : null,
+    currentModel.transmission ? `Canvi ${currentModel.transmission}` : null,
+    currentModel.fuel ? `Combustible ${currentModel.fuel}` : null,
   ].filter(Boolean) as string[];
 
   return (
@@ -74,7 +76,7 @@ export default async function ModelDetailPage({
 
           <h1>{model.name}</h1>
 
-          <p className="lead">{model.description}</p>
+          <p className="lead">{currentModel.description}</p>
 
           {stats.length > 0 && (
             <div className="stat-grid">
@@ -88,7 +90,7 @@ export default async function ModelDetailPage({
           )}
 
           <ul className="feature-list">
-            {model.features.map((item) => (
+            {currentModel.features.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
@@ -96,7 +98,7 @@ export default async function ModelDetailPage({
 
         <aside className="detail-aside card">
           <p className="badge">
-            {formatDailyPrice(model.pricePerDay, model.currency)}
+            {formatDailyPrice(currentModel.pricePerDay, currentModel.currency)}
           </p>
 
           <h3>Reserva la teva ruta</h3>
